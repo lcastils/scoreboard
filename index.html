@@ -2,10 +2,198 @@
 <html>
 
 <head>
-    <title>Home</title>
+    <title>Australia Open Scoreboard</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-    <div>hola mundo </div>
+
 <body>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Player 1</th>
+                <th>Player 2</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td id="player1-games">0</td>
+                <td id="player2-games">0</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="scoreboard">
+        <div class="player1 draggable" draggable="true" id="player1">
+            <h2>Player 1</h2>
+            <h1 id="player1-score">0</h1>
+            <button onclick="updatePlayer1Score()">Player 1 Scored</button>
+        </div>
+        <div class="player2 draggable" draggable="true" id="player2">
+            <h2>Player 2</h2>
+            <h1 id="player2-score">0</h1>
+            <button onclick="updatePlayer2Score()">Player 2 Scored</button>
+        </div>
+    </div>
+
+    <style>
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 50%;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+        }
+
+        .player1, .player2 {
+            text-align: center;
+            margin: 0 20px;
+            padding: 20px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            cursor: move;
+        }
+
+        h1 {
+            font-size: 48px;
+        }
+
+        button {
+            font-size: 24px;
+            padding: 10px;
+            margin-top: 20px;
+        }
+    </style>
+
+    <script>
+        // Variables para los puntajes y juegos
+        let player1Score = 0;
+        let player2Score = 0;
+        let player1Games = 0;
+        let player2Games = 0;
+        let player1Advantage = false;
+        let player2Advantage = false;
+
+        // Funciones para actualizar puntajes
+        function updatePlayer1Score() {
+            if (player1Score === 40 && player2Score === 40) {
+                // Si ambos están en 40, manejar deuce y ventaja
+                if (player1Advantage) {
+                    player1WinsGame();
+                } else if (player2Advantage) {
+                    // Si el otro jugador tiene ventaja, se vuelve a deuce
+                    player1Advantage = false;
+                    player2Advantage = false;
+                } else {
+                    player1Advantage = true;
+                }
+            } else if (player1Score === 30) {
+                player1Score = 40;
+            } else if (player1Score === 40) {
+                if (player2Score !== 40) {
+                    player1WinsGame();
+                } else {
+                    player1Advantage = true;
+                    player2Advantage = false;
+                }
+            } else {
+                player1Score += 15;
+            }
+            updateDisplay();
+        }
+
+        function updatePlayer2Score() {
+            if (player2Score === 40 && player1Score === 40) {
+                // Si ambos están en 40, manejar deuce y ventaja
+                if (player2Advantage) {
+                    player2WinsGame();
+                } else if (player1Advantage) {
+                    // Si el otro jugador tiene ventaja, se vuelve a deuce
+                    player2Advantage = false;
+                    player1Advantage = false;
+                } else {
+                    player2Advantage = true;
+                }
+            } else if (player2Score === 30) {
+                player2Score = 40;
+            } else if (player2Score === 40) {
+                if (player1Score !== 40) {
+                    player2WinsGame();
+                } else {
+                    player2Advantage = true;
+                    player1Advantage = false;
+                }
+            } else {
+                player2Score += 15;
+            }
+            updateDisplay();
+        }
+
+        function player1WinsGame() {
+            player1Games++;
+            player1Score = 0;
+            player2Score = 0;
+            player1Advantage = false;
+            player2Advantage = false;
+            document.getElementById("player1-games").textContent = player1Games;
+        }
+
+        function player2WinsGame() {
+            player2Games++;
+            player1Score = 0;
+            player2Score = 0;
+            player1Advantage = false;
+            player2Advantage = false;
+            document.getElementById("player2-games").textContent = player2Games;
+        }
+
+        function updateDisplay() {
+            document.getElementById("player1-score").textContent = player1Advantage ? "Adv" : player1Score;
+            document.getElementById("player2-score").textContent = player2Advantage ? "Adv" : player2Score;
+        }
+
+        // Drag and drop functionality (se mantiene igual que antes)
+        document.querySelectorAll('.draggable').forEach(item => {
+            item.addEventListener('dragstart', dragStart);
+        });
+
+        document.body.addEventListener('dragover', dragOver);
+        document.body.addEventListener('drop', drop);
+
+        let draggedItem = null;
+
+        function dragStart(event) {
+            draggedItem = event.target;
+            event.dataTransfer.setData('text/html', draggedItem.outerHTML);
+            event.dataTransfer.effectAllowed = 'move';
+        }
+
+        function dragOver(event) {
+            event.preventDefault();
+        }
+
+        function drop(event) {
+            event.preventDefault();
+            if (draggedItem) {
+                let dropTarget = event.target.closest('.draggable');
+                if (dropTarget && dropTarget !== draggedItem) {
+                    let parent = draggedItem.parentNode;
+                    parent.insertBefore(draggedItem, dropTarget.nextSibling);
+                }
+            }
+        }
+    </script>
 
 </body>
 
